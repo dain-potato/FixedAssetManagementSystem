@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Zxing\QrReader;
 use App\Models\assetModel;
 use App\Models\Maintenance;
-use App\Models\Department;
+use App\Models\department;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
