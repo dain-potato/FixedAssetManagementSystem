@@ -121,6 +121,8 @@ Route::middleware(['adminUserType', 'auth', 'verified'])->group(function () {
     // ASSET UPDATES
     Route::put('admin/asset/edit/{id}', [AsstController::class, 'update'])->name('adminAssetDetails.edit');
 
+    Route::delete('admin/assets/multi-delete', [AsstController::class, 'multiDelete'])->name('adminasset.multiDelete');
+
     //DISPOSE
     Route::post('admin/asset/dispose/{id}', [AsstController::class, 'dispose'])->name('adminAsset.dispose');
 
@@ -186,7 +188,7 @@ Route::middleware(['adminUserType', 'auth', 'verified'])->group(function () {
     route::get('/admin/assets/search', [SearchController::class, 'searchAssets'])->name('searchAssets');
     Route::get('/admin/activity-logs/search', [SearchController::class, 'searchActivityLogs'])->name('searchActivity');
     Route::get('/admin/maintenance-scheduling/search', [SearchController::class, 'searchPreventive'])->name('adminMaintenanceSchedSearch');
-    Route::get('/admin/maintenance/records/search', [SearchController::class, 'searchMaintenanceRecords'])->name('adminMaintenanceRecords.search');
+    Route::get('/admin/maintenance/records/search', [MaintenanceController::class, 'showRecords'])->name('adminMaintenanceRecords.search');
 
     /*
     -------------------
