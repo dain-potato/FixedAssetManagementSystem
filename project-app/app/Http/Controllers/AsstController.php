@@ -124,7 +124,7 @@ class AsstController extends Controller
         $endDate = $request->input('end_date');
 
         // Validate sorting field
-        $validSortFields = ['code', 'name', 'category_name', 'status'];
+        $validSortFields = ['code', 'name', 'category_name', 'status', 'depreciation', 'purchase_date'];
         if (!in_array($sortField, $validSortFields)) {
             $sortField = 'code';
         }
@@ -148,11 +148,11 @@ class AsstController extends Controller
                 return $query->whereIn('category.id', $categories);
             })
             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-                return $query->whereBetween('asset.created_at', [$startDate, $endDate]);
+                return $query->whereBetween('asset.purchase_date', [$startDate, $endDate]);
             })
             ->select('asset.*', 'category.name as category_name', 'department.name as department')
             ->orderBy($sortField, $sortDirection)
-            ->paginate($rowsPerPage) // Handle pagination
+            ->paginate($rowsPerPage)
             ->appends($request->except('page'));
 
         // Fetch all categories for the dropdown (filtered by department)
@@ -161,6 +161,7 @@ class AsstController extends Controller
         // Return the view with the necessary data
         return view('dept_head.asset', compact('assets', 'categoriesList'));
     }
+
 
     public function showHistory($id)
     {
