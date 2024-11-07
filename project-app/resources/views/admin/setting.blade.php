@@ -12,7 +12,6 @@
 @endsection
 @section('content')
 
-    {{-- <div class="cont relative p-1 h-full"> --}}
     <div class="cont relative p-2 md:p-1 h-full">
         @if ($errors->any())
             <div class="alert alert-danger">
@@ -23,96 +22,108 @@
                 </ul>
             </div>
         @endif
-        @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+
+
+        @if (Auth::user()->usertype === 'admin')
+            <!-- Department Dropdown for Admin -->
+            <div class="deptDropdown w-64 mb-4 flex items-center gap-2">
+                <label for="departments" class="block text-sm font-medium text-gray-700 mb-2">Department</label>
+                <select name="dept" id="departments" required
+                    class="block w-full px-4 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Select Department</option>
+                    @foreach ($allDepartments as $department)
+                        <option value="{{ $department->id }}"
+                            {{ $department->id == $selectedDepartmentID ? 'selected' : '' }}>{{ $department->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        @endif
+
         <div class="container relative h-full p-2 flex flex-col gap-2">
             {{-- <div class="flex justify-between"> --}}
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center"> <!-- Added flex-wrap -->
                 {{-- <ul class="flex border-b max-w-max border-gray-300 inline-block"> --}}
-                <ul class="flex flex-wrap border-b max-w-full md:max-w-max border-gray-300"> <!-- Adjusted for small screens -->
+                <!-- Tabs with department_id -->
+                <ul class="flex flex-wrap border-b max-w-full md:max-w-max border-gray-300">
                     <li class="mr-1">
-                        {{-- <a class="inline-block py-2 px-4 {{ $activeTab === 'model' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500 hover:text-blue-500' }}" --}}
                         <a class="inline-block py-2 px-4 text-sm {{ $activeTab === 'model' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500 hover:text-blue-500' }}"
-                            href="{{ url('/setting?tab=model') }}">
+                            href="{{ url('/admin/setting?tab=model&department_id=' . $selectedDepartmentID) }}">
                             Model
                         </a>
                     </li>
                     <li class="mr-1">
-                        {{-- <a class="inline-block py-2 px-4 {{ $activeTab === 'manufacturer' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500 hover:text-blue-500' }}" --}}
                         <a class="inline-block py-2 px-4 text-sm {{ $activeTab === 'manufacturer' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500 hover:text-blue-500' }}"
-                            href="{{ url('/setting?tab=manufacturer') }}">
+                            href="{{ url('/admin/setting?tab=manufacturer&department_id=' . $selectedDepartmentID) }}">
                             Manufacturer
                         </a>
                     </li>
                     <li class="mr-1">
-                        {{-- <a class="inline-block py-2 px-4 {{ $activeTab === 'location' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500 hover:text-blue-500' }}" --}}
                         <a class="inline-block py-2 px-4 text-sm {{ $activeTab === 'location' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500 hover:text-blue-500' }}"
-                            href="{{ url('/setting?tab=location') }}">
+                            href="{{ url('/admin/setting?tab=location&department_id=' . $selectedDepartmentID) }}">
                             Location
                         </a>
                     </li>
                     <li class="mr-1">
-                        {{-- <a class="inline-block py-2 px-4 {{ $activeTab === 'category' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500 hover:text-blue-500' }}" --}}
                         <a class="inline-block py-2 px-4 text-sm {{ $activeTab === 'category' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500 hover:text-blue-500' }}"
-                            href="{{ url('/setting?tab=category') }}">
+                            href="{{ url('/admin/setting?tab=category&department_id=' . $selectedDepartmentID) }}">
                             Category
                         </a>
                     </li>
                     <li class="mr-1">
-                        {{-- <a class="inline-block py-2 px-4 {{ $activeTab === 'customFields' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500 hover:text-blue-500' }}" --}}
                         <a class="inline-block py-2 px-4 text-sm {{ $activeTab === 'customFields' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500 hover:text-blue-500' }}"
-                            href="{{ url('/setting?tab=customFields') }}">
+                            href="{{ url('/admin/setting?tab=customFields&department_id=' . $selectedDepartmentID) }}">
                             Custom Field
                         </a>
                     </li>
                 </ul>
                 <!-- Button to Open the Modal -->
-                <button onclick="openModal()"
-                {{-- class="px-3 py-1 h-10 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600 focus:outline-none flex items-center"> --}}
-                class="px-2 md:px-3 py-1 h-10 bg-blue-950 text-white rounded-md shadow hover:bg-blue-950/80 focus:outline-none flex items-center mt-2 md:mt-0">
-                New {{ $activeTab !== 'customFields' ? ucfirst($activeTab): ucfirst("custom fields") }}</button>
+                <button onclick="openModal()" {{-- class="px-3 py-1 h-10 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600 focus:outline-none flex items-center"> --}}
+                    class="px-2 md:px-3 py-1 h-10 bg-blue-950 text-white rounded-md shadow hover:bg-blue-950/80 focus:outline-none flex items-center mt-2 md:mt-0">
+                    New {{ $activeTab !== 'customFields' ? ucfirst($activeTab) : ucfirst('custom fields') }}</button>
 
 
                 <!-- Include the Modal -->
-                @include('dept_head.modal.newSettingModal')
+                @include('admin.modal.newSettingModal')
             </div>
 
 
             {{-- <div class="tab-content relative h-full bg-white border border-white rounded-lg overflow-y-auto"> --}}
-            <div class="tab-content relative h-full bg-white border border-white rounded-lg overflow-y-auto mt-2"> <!-- Added margin -->
+            <div class="tab-content relative h-full bg-white border border-white rounded-lg overflow-y-auto mt-2">
+                <!-- Added margin -->
 
                 <table class="w-full gap-2">
                     <thead class="bg-gray-100 ">
                         <tr>
                             @if ($activeTab !== 'customFields')
                                 {{-- <td class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"> --}}
-                                <td class="px-2 md:px-6 py-2 md:py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 uppercase tracking-wider">
+                                <td
+                                    class="px-2 md:px-6 py-2 md:py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 uppercase tracking-wider">
                                     Name</td>
                                 {{-- <td class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"> --}}
-                                <td class="px-2 md:px-6 py-2 md:py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 uppercase tracking-wider">
+                                <td
+                                    class="px-2 md:px-6 py-2 md:py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 uppercase tracking-wider">
                                     Description</td>
                                 {{-- <td class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"> --}}
-                                <td class="px-2 md:px-6 py-2 md:py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 uppercase tracking-wider">
+                                <td
+                                    class="px-2 md:px-6 py-2 md:py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 uppercase tracking-wider">
                                     Actions</td>
                             @else
                                 {{-- <td class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"> --}}
-                                <td class="px-2 md:px-6 py-2 md:py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 uppercase tracking-wider">
+                                <td
+                                    class="px-2 md:px-6 py-2 md:py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 uppercase tracking-wider">
                                     Name</td>
                                 {{-- <td class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"> --}}
-                                <td class="px-2 md:px-6 py-2 md:py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 uppercase tracking-wider">
+                                <td
+                                    class="px-2 md:px-6 py-2 md:py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 uppercase tracking-wider">
                                     Type</td>
                                 {{-- <td class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"> --}}
-                                <td class="px-2 md:px-6 py-2 md:py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 uppercase tracking-wider">
+                                <td
+                                    class="px-2 md:px-6 py-2 md:py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 uppercase tracking-wider">
                                     Helper Text</td>
                                 {{-- <td class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"> --}}
-                                <td class="px-2 md:px-6 py-2 md:py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 uppercase tracking-wider">
+                                <td
+                                    class="px-2 md:px-6 py-2 md:py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 uppercase tracking-wider">
                                     Action</td>
                             @endif
                         </tr>
@@ -122,46 +133,51 @@
                             @foreach ($data as $key => $dataItem)
                                 <tr class="" id="row-{{ $activeTab !== 'customFields' ? $dataItem->id : $key }}">
                                     @if ($activeTab !== 'customFields')
-                                        <td class="w-64 px-3 py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 tracking-wider">
-                                            <span
-                                                class="name-text">{{ $dataItem->name }}</span>
-                                            <input type="text" class="name-input px-3 py-2 text-left text-xs font-medium text-gray-500 tracking-wider" style="display: none"
-                                                value="{{ $dataItem->name }}">
+                                        <td
+                                            class="w-64 px-3 py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 tracking-wider">
+                                            <span class="name-text">{{ $dataItem->name }}</span>
+                                            <input type="text"
+                                                class="name-input px-3 py-2 text-left text-xs font-medium text-gray-500 tracking-wider"
+                                                style="display: none" value="{{ $dataItem->name }}">
 
                                         </td>
-                                        <td class="px-2 py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 tracking-wider">
-                                            <span
-                                                class="desc-text ">{{ $dataItem->description }}</span>
+                                        <td
+                                            class="px-2 py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 tracking-wider">
+                                            <span class="desc-text ">{{ $dataItem->description }}</span>
                                             <input type="text"
                                                 class="desc-input px-3 py-2 text-left text-xs font-medium text-gray-500 tracking-wider"
                                                 style="display: none" value="{{ $dataItem->description }}">
                                         </td>
-                                        <td class="flex gap-1 px-2 py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 tracking-wider">
+                                        <td
+                                            class="flex gap-1 px-2 py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 tracking-wider">
                                             <a class="bg-blue-950 text-white px-3 py-2 rounded-md transition duration-300 ease-in-out hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer edit-btn"
                                                 data-row-id="{{ $dataItem->id }}">Edit</a>
-                                            <a class="bg-blue-950 text-white px-3 py-2 rounded-md transition duration-300 ease-in-out hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer save-btn" data-row-id="{{ $dataItem->id }}"
-                                                style="display: none;">Save</a>
+                                            <a class="bg-blue-950 text-white px-3 py-2 rounded-md transition duration-300 ease-in-out hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer save-btn"
+                                                data-row-id="{{ $dataItem->id }}" style="display: none;">Save</a>
                                             <a class="bg-red-400 text-white px-3 py-2 rounded-md transition duration-300 ease-in-out hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer cancel-btn"
                                                 data-row-id="{{ $dataItem->id }}" style="display: none;">Cancel</a>
 
                                             <form
-                                                action="{{ route('setting.delete', ['tab' => $activeTab, 'id' => $dataItem->id]) }}"
+                                                action="{{ route('admin.setting.delete', ['tab' => $activeTab, 'id' => $dataItem->id]) }}"
                                                 method="post" class="inline-block">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button class="bg-red-400 text-white px-3 py-2 rounded-md transition duration-300 ease-in-out hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 delete-btn">Delete</button>
+                                                <button
+                                                    class="bg-red-400 text-white px-3 py-2 rounded-md transition duration-300 ease-in-out hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 delete-btn">Delete</button>
                                             </form>
                                         </td>
                                     @else
-                                        <td class="w-64 px-3 py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 tracking-wider">
-                                            <span class="name-text">{{ $dataItem['name'] }}</span>
-                                            <input type="text" class="name-input px-3 py-2 text-left text-xs font-medium text-gray-500 tracking-wider" style="display: none"
-                                                value="{{ $dataItem['name'] }}">
+                                        <td
+                                            class="px-2 py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 tracking-wider">
+                                            <span class="name-text">{{ $dataItem->name }}</span>
+                                            <input type="text" class="name-input" style="display: none"
+                                                value="{{ $dataItem->name }}">
 
                                         </td>
-                                        <td class="px-2 py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 tracking-wider">
-                                            <span class="type-text ">{{ $dataItem["type"] }}</span>
-                                            <select name="type" class="type-input px-3 py-2 text-left text-xs font-medium text-gray-500 tracking-wider" style="display: none">
+                                        <td
+                                            class="px-2 py-3 text-left text-xs sm:text-xs md:text-md font-medium text-gray-500 tracking-wider">
+                                            <span class="type-text ">{{ $dataItem->type }}</span>
+                                            <select name="type" class="type-input" style="display: none">
                                                 <option value="number">Number</option>
                                                 <option value="text">Text</option>
                                                 <option value="date">Date</option>
@@ -169,28 +185,31 @@
                                             {{-- <input type="text" class="type-input" style="display: none"
                                                 value="{{ $dataItem->type }}"> --}}
                                         </td>
-                                        <td class="px-2 py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 tracking-wider">
-                                            <span class="helper-text">{{ $dataItem['helptext'] }}</span>
+                                        <td
+                                            class="px-2 py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 tracking-wider">
+                                            <span class="helper-text">{{ $dataItem->helptext }}</span>
 
-                                            <input type="text" class="helper-input px-3 py-2 text-left text-xs font-medium text-gray-500 tracking-wider" style="display: none"
-                                                value="{{ $dataItem['helptext'] }}">
+                                            <input type="text" class="helper-input" style="display: none"
+                                                value="{{ $dataItem->helptext }}">
                                         </td>
-                                        <td class="flex gap-1 px-2 py-3 text-left sm:text-xs md:text-md font-medium text-gray-500 tracking-wider">
+                                        <td
+                                            class="flex py-2 text-left sm:text-xs md:text-md font-medium text-gray-500 tracking-wider">
                                             <a class="bg-blue-950 text-white px-3 py-2 rounded-md transition duration-300 ease-in-out hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer edit-btn"
                                                 data-row-id="{{ $key }}">Edit</a>
-                                            <a class="bg-blue-950 text-white px-3 py-2 rounded-md transition duration-300 ease-in-out hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 save-btn" data-row-id="{{ $key }}"
-                                                style="display: none;">Save</a>
+                                            <a class="bg-blue-950 text-white px-3 py-2 rounded-md transition duration-300 ease-in-out hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 save-btn"
+                                                data-row-id="{{ $key }}" style="display: none;">Save</a>
                                             <a class="bg-red-400 text-white px-3 py-2 rounded-md transition duration-300 ease-in-out hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 cancel-btn"
                                                 data-row-id="{{ $key }}" style="display: none;">Cancel</a>
 
                                             <div class="ml-1">
                                                 <form
-                                                action="{{ route('setting.delete', ['tab' => $activeTab, 'id' => $key]) }}"
-                                                method="post" >
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="bg-red-400 text-white px-3 py-2 rounded-md transition duration-300 ease-in-out hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 delete-btn">Delete</button>
-                                            </form>
+                                                    action="{{ route('admin.setting.delete', ['tab' => $activeTab, 'id' => $key]) }}"
+                                                    method="post">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button
+                                                        class="bg-red-400 text-white px-3 py-2 rounded-md transition duration-300 ease-in-out hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 delete-btn">Delete</button>
+                                                </form>
                                             </div>
                                         </td>
                                     @endif
@@ -198,7 +217,9 @@
                             @endforeach
                         @else
                             <tr>
-                                <td colspan="{{ $activeTab !== 'customFields' ? 3 : 4 }}" class="px-2 md:px-6 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-gray-500 text-center uppercase tracking-wider ">NO DATA FOUND</td>
+                                <td colspan="{{ $activeTab !== 'customFields' ? 3 : 4 }}"
+                                    class="px-2 md:px-6 py-2 md:py-3 text-left text-xs md:text-sm font-medium text-gray-500 text-center uppercase tracking-wider ">
+                                    NO DATA FOUND</td>
                             </tr>
                         @endif
                     </tbody>
@@ -206,13 +227,15 @@
             </div>
         </div>
     </div>
-    @if (session('session'))
-        <div id="toast" class="absolute bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded shadow-lg">
-            {{ session('session') }}
-        </div>
-    @endif
-
     <script>
+        document.getElementById('departments').addEventListener('change', function() {
+            const departmentID = this.value;
+            const activeTab = new URLSearchParams(window.location.search).get('tab') || 'model';
+            const url = new URL(window.location.href);
+            url.searchParams.set('department_id', departmentID);
+            url.searchParams.set('tab', activeTab);
+            window.location.href = url.toString();
+        });
 
         document.querySelectorAll('.edit-btn').forEach(function(button) {
             button.addEventListener('click', function() {
@@ -285,7 +308,7 @@
                 const rowId = this.getAttribute('data-row-id');
                 const row = document.getElementById('row-' + rowId);
                 const urlParams = new URLSearchParams(window.location.search);
-                let activeTab = urlParams.get('tab') ?? 'model' ;
+                let activeTab = urlParams.get('tab') ?? 'model';
 
                 const nameValue = row.querySelector('.name-input').value;
                 let loader;
@@ -309,7 +332,7 @@
                 }
 
                 // AJAX call to save the updated data
-                fetch(`/setting/update/${activeTab}/${rowId}`, {
+                fetch(`/admin/setting/update/${activeTab}/${rowId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
@@ -368,9 +391,7 @@
                     });
             });
         });
-
     </script>
-
-    </div>
-    </div>
+   </div>
+</div>
 @endsection
