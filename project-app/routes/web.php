@@ -153,6 +153,7 @@ Route::middleware(['adminUserType', 'auth', 'verified'])->group(function () {
     // MAINTENANCE PREVENTIVE-PREDICTIVE
     Route::get('/admin/maintenance_sched', [MaintenanceSchedController::class, 'showPreventive'])->name('adminMaintenance_sched');
     Route::get('/admin/maintenance_sched/predictive', [MaintenanceSchedController::class, 'showPredictive'])->name('adminMaintenance_sched.predictive');
+    Route::delete('/admin/preventive/{id}', [PreventiveMaintenanceController::class, 'destroy'])->name('admin.preventive.delete');
 
     // INITIAL
     // -----------
@@ -184,6 +185,8 @@ Route::middleware(['adminUserType', 'auth', 'verified'])->group(function () {
     Route::get('/admin/activity-logs', [ActivityLogController::class, 'index'])->name('admin.activity-logs');
     Route::get('/admin/activity-logs/export', [ActivityLogController::class, 'export'])->name('activityLogs.export');
     Route::post('/admin/activity-logs/settings', [ActivityLogController::class, 'updateSettings'])->name('activityLogs.updateSettings');
+    Route::get('/admin/activity-logs/deletion-timer', [ActivityLogController::class, 'getNextDeletionTime'])->name('activityLogs.getNextDeletionTime');
+
 
     /*
     -------------------
@@ -296,6 +299,8 @@ Route::middleware(['deptHeadUserType', 'auth', 'verified'])->group(function () {
 
     // PREVENTIVE-PREDICTIVE
     Route::get('/maintenance_sched', [MaintenanceSchedController::class, 'showPreventive'])->name('maintenance_sched');
+    Route::delete('/preventive/{id}', [PreventiveMaintenanceController::class, 'destroy'])->name('preventive.destroy');
+
     Route::get('/maintenance_sched/predictive', [MaintenanceSchedController::class, 'showPredictive'])->name('maintenance_sched.predictive');
 
     // CREATE
